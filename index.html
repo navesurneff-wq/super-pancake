@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f6f8f7">
+  <meta name="description" content="LIFE TRACKER — ton tableau de bord personnel, disponible hors ligne.">
+  <title>LIFE TRACKER</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand"><div class="brand-mark">L</div><div><div class="brand-name">LIFE TRACKER</div><div class="brand-sub">Ton espace de pilotage</div></div></div>
+      <div class="top-actions"><span id="connectionState" class="status"><i></i> Hors ligne prêt</span><button class="icon-button" id="openSettings" aria-label="Réglages">⚙</button></div>
+    </header>
+
+    <main id="mainContent">
+      <section class="page active" id="page-dashboard">
+        <div class="page-heading"><div><p class="eyebrow" id="todayLabel">AUJOURD'HUI</p><h1>Bonjour.</h1><p class="muted">Voici où tu en es.</p></div><button class="primary-button" data-action="add-task">＋ Nouvelle tâche</button></div>
+        <div class="stats-grid">
+          <article class="stat-card"><span class="stat-icon green">✓</span><span class="stat-label">Tâches ouvertes</span><strong id="statOpen">0</strong><small id="statDue">Aucune échéance aujourd'hui</small></article>
+          <article class="stat-card"><span class="stat-icon blue">◎</span><span class="stat-label">Objectifs actifs</span><strong id="statGoals">0</strong><small>En cours de progression</small></article>
+          <article class="stat-card"><span class="stat-icon amber">€</span><span class="stat-label">Solde du mois</span><strong id="statBalance">0 €</strong><small>Revenus moins dépenses</small></article>
+          <article class="stat-card"><span class="stat-icon violet">↗</span><span class="stat-label">Habitudes suivies</span><strong id="statHabits">0</strong><small>Routines actives</small></article>
+        </div>
+        <div class="dashboard-grid">
+          <section class="panel"><div class="panel-heading"><div><p class="eyebrow">PRIORITÉS</p><h2>À faire ensuite</h2></div><button class="text-button" data-go="planning">Tout voir →</button></div><div id="dashboardTasks" class="task-list empty-state">Aucune tâche pour le moment.</div></section>
+          <section class="panel"><div class="panel-heading"><div><p class="eyebrow">PROGRESSION</p><h2>Objectifs en cours</h2></div><button class="text-button" data-go="goals">Tout voir →</button></div><div id="dashboardGoals" class="goal-list empty-state">Ajoute un objectif pour suivre tes progrès.</div></section>
+        </div>
+        <section class="panel"><div class="panel-heading"><div><p class="eyebrow">VUE D'ENSEMBLE</p><h2>Cette semaine</h2></div><span class="muted small" id="weekRange"></span></div><div class="week-bars" id="weekBars"></div></section>
+      </section>
+
+      <section class="page" id="page-planning">
+        <div class="page-heading"><div><p class="eyebrow">ORGANISATION</p><h1>Planning</h1><p class="muted">Planifie, priorise et avance.</p></div><button class="primary-button" data-action="add-task">＋ Ajouter</button></div>
+        <div class="toolbar"><div class="segmented" id="planningView"><button class="selected" data-view="week">Semaine</button><button data-view="month">Mois</button><button data-view="all">Tout</button></div><select id="taskFilter" aria-label="Filtrer les tâches"><option value="all">Toutes les catégories</option><option>Travail</option><option>Sport</option><option>Finances</option><option>Personnel</option><option>Santé</option><option>Apprentissage</option></select></div>
+        <div id="planningList" class="panel task-list"></div>
+      </section>
+
+      <section class="page" id="page-goals">
+        <div class="page-heading"><div><p class="eyebrow">CAP À SUIVRE</p><h1>Objectifs</h1><p class="muted">Des étapes concrètes vers tes projets.</p></div><button class="primary-button" data-action="add-goal">＋ Nouvel objectif</button></div>
+        <div class="toolbar"><div class="segmented" id="goalFilter"><button class="selected" data-filter="active">En cours</button><button data-filter="all">Tous</button><button data-filter="done">Terminés</button></div></div>
+        <div id="goalsList" class="cards-grid"></div>
+      </section>
+
+      <section class="page" id="page-finance">
+        <div class="page-heading"><div><p class="eyebrow">ARGENT</p><h1>Finances</h1><p class="muted">Un suivi simple, saisi manuellement.</p></div><button class="primary-button" data-action="add-transaction">＋ Opération</button></div>
+        <div class="stats-grid finance-stats"><article class="stat-card"><span class="stat-label">Revenus du mois</span><strong id="financeIncome">0 €</strong></article><article class="stat-card"><span class="stat-label">Dépenses du mois</span><strong id="financeExpenses">0 €</strong></article><article class="stat-card"><span class="stat-label">Solde du mois</span><strong id="financeNet">0 €</strong></article></div>
+        <section class="panel"><div class="panel-heading"><div><p class="eyebrow">HISTORIQUE</p><h2>Dernières opérations</h2></div><select id="financePeriod"><option value="month">Ce mois</option><option value="all">Tout l'historique</option></select></div><div id="transactionsList" class="transaction-list empty-state">Aucune opération enregistrée.</div></section>
+      </section>
+
+      <section class="page" id="page-sport">
+        <div class="page-heading"><div><p class="eyebrow">ACTIVITÉ</p><h1>Sport</h1><p class="muted">Garde une trace de tes séances.</p></div><button class="primary-button" data-action="add-sport">＋ Séance</button></div>
+        <div class="stats-grid"><article class="stat-card"><span class="stat-label">Séances ce mois</span><strong id="sportCount">0</strong></article><article class="stat-card"><span class="stat-label">Temps total</span><strong id="sportTime">0 h</strong></article><article class="stat-card"><span class="stat-label">Distance</span><strong id="sportDistance">0 km</strong></article></div>
+        <section class="panel"><div class="panel-heading"><div><p class="eyebrow">JOURNAL</p><h2>Activités récentes</h2></div></div><div id="sportList" class="activity-list empty-state">Enregistre ta première séance.</div></section>
+      </section>
+
+      <section class="page" id="page-work">
+        <div class="page-heading"><div><p class="eyebrow">PROJETS</p><h1>Travail & personnel</h1><p class="muted">Suis tes projets et tes habitudes.</p></div><button class="primary-button" data-action="add-habit">＋ Habitude</button></div>
+        <div class="dashboard-grid">
+          <section class="panel"><div class="panel-heading"><div><p class="eyebrow">ROUTINES</p><h2>Habitudes</h2></div></div><div id="habitsList" class="habit-list empty-state">Aucune habitude créée.</div></section>
+          <section class="panel"><div class="panel-heading"><div><p class="eyebrow">SUIVI</p><h2>Projets</h2></div><button class="text-button" data-action="add-project">＋ Projet</button></div><div id="projectsList" class="project-list empty-state">Aucun projet pour le moment.</div></section>
+        </div>
+      </section>
+
+      <section class="page" id="page-assistant">
+        <div class="page-heading"><div><p class="eyebrow">ANALYSE LOCALE</p><h1>Assistant</h1><p class="muted">Des observations calculées sur cet appareil.</p></div></div>
+        <div class="assistant-intro"><div class="assistant-symbol">✳</div><div><strong>Assistant LIFE TRACKER</strong><p>Aucun modèle génératif. Tes données ne quittent pas cet appareil.</p></div></div>
+        <div id="insightsList" class="insights-list"></div>
+        <section class="panel"><div class="panel-heading"><div><p class="eyebrow">BILAN</p><h2>Préparer un bilan</h2></div></div><div class="toolbar"><select id="reviewPeriod"><option value="week">Cette semaine</option><option value="month">Ce mois</option></select><button class="primary-button" id="generateReview">Générer le bilan</button></div><div id="reviewOutput" class="review-output muted">Le bilan apparaîtra ici.</div></section>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Navigation principale">
+      <button class="nav-item active" data-page="dashboard"><span>⌂</span><small>Accueil</small></button>
+      <button class="nav-item" data-page="planning"><span>▦</span><small>Planning</small></button>
+      <button class="nav-item" data-page="goals"><span>◎</span><small>Objectifs</small></button>
+      <button class="nav-item" data-page="finance"><span>€</span><small>Finances</small></button>
+      <button class="nav-item" data-page="assistant"><span>✳</span><small>Assistant</small></button>
+    </nav>
+  </div>
+
+  <dialog id="editDialog"><form method="dialog" id="editForm"><div class="dialog-head"><div><p class="eyebrow" id="dialogEyebrow">NOUVEAU</p><h2 id="dialogTitle">Ajouter</h2></div><button class="icon-button" value="cancel" aria-label="Fermer">×</button></div><div id="dialogFields" class="form-fields"></div><div class="dialog-actions"><button class="secondary-button" value="cancel">Annuler</button><button class="primary-button" id="saveDialog" value="default">Enregistrer</button></div></form></dialog>
+
+  <dialog id="settingsDialog"><form method="dialog"><div class="dialog-head"><div><p class="eyebrow">PERSONNALISATION</p><h2>Réglages</h2></div><button class="icon-button" value="cancel">×</button></div>
+    <div class="settings-content">
+      <div class="setting-row"><div><strong>Verrouillage par code</strong><p>Protection locale au lancement de l'application.</p></div><button type="button" class="secondary-button" id="setPinButton">Configurer</button></div>
+      <div class="setting-row"><div><strong>Sauvegarde</strong><p>Exporter ou restaurer toutes tes données.</p></div><div class="button-stack"><button type="button" class="secondary-button" id="exportButton">Exporter JSON</button><button type="button" class="secondary-button" id="importButton">Importer JSON</button><input type="file" id="importFile" accept="application/json,.json" hidden></div></div>
+      <div class="setting-row"><div><strong>Installation</strong><p id="installHelp">Ajouter LIFE TRACKER à l'écran d'accueil depuis le menu Partager de Safari.</p></div></div>
+      <div class="setting-row"><div><strong>Stockage</strong><p>Toutes les données restent dans le stockage local de ce navigateur. Fais des exports réguliers.</p></div></div>
+      <div class="setting-row"><div><strong>Notifications</strong><p>Sur iPhone, les notifications web nécessitent l'installation sur l'écran d'accueil et l'autorisation. Les rappels restent visibles dans l'application ; les alertes en arrière-plan ne sont pas garanties.</p><button type="button" class="secondary-button" id="notifyButton">Autoriser les notifications</button></div></div>
+      <div class="setting-row"><button type="button" class="danger-button" id="resetButton">Effacer toutes les données</button></div>
+    </div>
+  </form></dialog>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+  <div id="pinOverlay" class="pin-overlay hidden"><div class="pin-card"><div class="brand-mark">L</div><h2>Déverrouiller LIFE TRACKER</h2><p class="muted">Saisis ton code personnel.</p><input id="pinInput" type="password" inputmode="numeric" maxlength="8" placeholder="Code"><button class="primary-button" id="unlockButton">Déverrouiller</button><p id="pinError" class="error-text"></p></div></div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
