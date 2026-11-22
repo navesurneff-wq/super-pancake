@@ -32,7 +32,7 @@ function render(){
   const open=state.tasks.filter(t=>!t.done), due=open.filter(t=>t.date===today()).length, goals=state.goals.filter(g=>g.progress<100), totals=monthTotals();
   $("#todayLabel").textContent=new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"}).toUpperCase();
   $("#statOpen").textContent=open.length;$("#statDue").textContent=due?`${due} échéance(s) aujourd'hui`:"Aucune échéance aujourd'hui";
-  $("#statGoals").textContent=goals.length;$("#statBalance").textContent=money(totals.income-totals.expense);$("#statHabits").textContent=state.habits.filter(h=>h.active).length;
+  $("#statGoals").textContent=goals.length;$("#statBalance").textContent=money(totals.income-totals.expense);$("#statHabits").textContent=state.routines.length;
   renderDashboardTasks();renderDashboardGoals();renderWeekBars();renderPlanning();renderGoals();renderFinance();renderSport();renderWork();renderAssistant();
 }
 function taskHTML(t){return `<div class="task-row"><button class="task-check ${t.done?"done":""}" data-complete="${t.id}" aria-label="Terminer">${t.done?"✓":""}</button><div class="task-main"><div class="task-title ${t.done?"completed":""}">${esc(t.title)}</div><div class="task-meta">${dateFR(t.date)} · ${esc(t.category)}${t.repeat!=="none"?" · "+esc(t.repeatLabel):""}</div></div><span class="priority ${t.priority==="Haute"?"high":t.priority==="Normale"?"medium":""}">${esc(t.priority)}</span></div>`;}
