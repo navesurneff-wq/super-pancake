@@ -9,6 +9,7 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
   <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./daily-todo.css">
 </head>
 <body>
   <div class="app-shell">
@@ -26,6 +27,23 @@
           <article class="stat-card"><span class="stat-icon amber">€</span><span class="stat-label">Solde du mois</span><strong id="statBalance">0 €</strong><small>Revenus moins dépenses</small></article>
           <article class="stat-card"><span class="stat-icon violet">↗</span><span class="stat-label">Habitudes suivies</span><strong id="statHabits">0</strong><small>Routines actives</small></article>
         </div>
+
+        <section class="panel daily-todo-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">ORGANISATION QUOTIDIENNE</p>
+              <h2>Ma To Do List</h2>
+              <p class="muted small" id="dailyTodoCount">0 tâche terminée</p>
+            </div>
+            <button class="primary-button" data-action="add-task">＋ Ajouter</button>
+          </div>
+          <div class="daily-progress">
+            <div class="progress-track"><div class="progress-fill" id="dailyTodoProgress" style="width:0%"></div></div>
+            <strong id="dailyTodoPercent">0%</strong>
+          </div>
+          <div id="dailyTodoList" class="task-list empty-state">Aucune tâche prévue aujourd'hui.</div>
+        </section>
+
         <div class="dashboard-grid">
           <section class="panel"><div class="panel-heading"><div><p class="eyebrow">PRIORITÉS</p><h2>À faire ensuite</h2></div><button class="text-button" data-go="planning">Tout voir →</button></div><div id="dashboardTasks" class="task-list empty-state">Aucune tâche pour le moment.</div></section>
           <section class="panel"><div class="panel-heading"><div><p class="eyebrow">PROGRESSION</p><h2>Objectifs en cours</h2></div><button class="text-button" data-go="goals">Tout voir →</button></div><div id="dashboardGoals" class="goal-list empty-state">Ajoute un objectif pour suivre tes progrès.</div></section>
@@ -101,5 +119,6 @@
   <div id="pinOverlay" class="pin-overlay hidden"><div class="pin-card"><div class="brand-mark">L</div><h2>Déverrouiller LIFE TRACKER</h2><p class="muted">Saisis ton code personnel.</p><input id="pinInput" type="password" inputmode="numeric" maxlength="8" placeholder="Code"><button class="primary-button" id="unlockButton">Déverrouiller</button><p id="pinError" class="error-text"></p></div></div>
 
   <script src="./app.js"></script>
+  <script src="./daily-todo.js"></script>
 </body>
 </html>

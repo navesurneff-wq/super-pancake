@@ -1,0 +1,21 @@
+MISE À JOUR LIFE TRACKER — TO DO LIST QUOTIDIENNE
+
+Cette mise à jour ajoute une To Do List sur la page d'accueil.
+Elle réutilise les tâches déjà enregistrées dans LIFE TRACKER et ne modifie
+pas le format de stockage ni les autres fonctionnalités.
+
+FICHIERS À AJOUTER / REMPLACER DANS LE MÊME DOSSIER QUE app.js :
+- index.html       : remplace ton index.html actuel
+- daily-todo.js    : ajoute ce nouveau fichier
+- daily-todo.css   : ajoute ce nouveau fichier
+
+IMPORTANT :
+- Ne remplace pas app.js : garde ton fichier app.js actuel inchangé.
+- Ne remplace pas style.css : garde ton fichier style.css actuel inchangé.
+- Garde manifest.webmanifest, sw.js et le dossier icons existants.
+- Exporte une sauvegarde JSON depuis les Réglages avant la mise à jour.
+
+La liste affiche les tâches dont la date est aujourd'hui. Le bouton Ajouter
+utilise le formulaire de création de tâche existant. Les cases de validation
+utilisent le mécanisme existant et les changements restent sauvegardés dans
+le stockage local habituel.
