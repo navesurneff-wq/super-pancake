@@ -33,9 +33,25 @@ function render(){
   $("#todayLabel").textContent=new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"}).toUpperCase();
   $("#statOpen").textContent=open.length;$("#statDue").textContent=due?`${due} échéance(s) aujourd'hui`:"Aucune échéance aujourd'hui";
   $("#statGoals").textContent=goals.length;$("#statBalance").textContent=money(totals.income-totals.expense);$("#statHabits").textContent=state.routines.length;
-  renderDashboardTasks();renderDashboardGoals();renderWeekBars();renderPlanning();renderGoals();renderFinance();renderSport();renderWork();renderAssistant();
+  renderDashboardTasks();renderDailyTodo();renderDashboardGoals();renderWeekBars();renderPlanning();renderGoals();renderFinance();renderSport();renderWork();renderAssistant();
 }
 function taskHTML(t){return `<div class="task-row"><button class="task-check ${t.done?"done":""}" data-complete="${t.id}" aria-label="Terminer">${t.done?"✓":""}</button><div class="task-main"><div class="task-title ${t.done?"completed":""}">${esc(t.title)}</div><div class="task-meta">${dateFR(t.date)} · ${esc(t.category)}${t.repeat!=="none"?" · "+esc(t.repeatLabel):""}</div></div><span class="priority ${t.priority==="Haute"?"high":t.priority==="Normale"?"medium":""}">${esc(t.priority)}</span></div>`;}
+function renderDailyTodo(){
+  const host=$("#dailyTodoList"),count=$("#dailyTodoCount"),percentLabel=$("#dailyTodoPercent"),progress=$("#dailyTodoProgress");
+  if(!host||!count||!percentLabel||!progress)return;
+  const items=state.tasks.filter(task=>task.date===today()).sort((a,b)=>{
+    if(a.done!==b.done)return a.done?1:-1;
+    const rank={Haute:0,Normale:1,Basse:2};
+    return (rank[a.priority]??1)-(rank[b.priority]??1);
+  });
+  const total=items.length,completed=items.filter(task=>task.done).length;
+  const percentage=total?Math.round(completed/total*100):0;
+  count.textContent=`${completed} / ${total} tâche(s) terminée(s)`;
+  percentLabel.textContent=`${percentage}%`;progress.style.width=`${percentage}%`;
+  host.className=total?"task-list":"task-list empty-state";
+  host.innerHTML=total?items.map(taskHTML).join(""):"Aucune tâche prévue aujourd'hui. Utilise le bouton Ajouter pour commencer.";
+}
+
 function renderDashboardTasks(){const items=state.tasks.filter(t=>!t.done).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,4);$("#dashboardTasks").className=items.length?"task-list":"task-list empty-state";$("#dashboardTasks").innerHTML=items.length?items.map(taskHTML).join(""):"Aucune tâche pour le moment.";}
 function renderDashboardGoals(){const items=state.goals.filter(g=>g.progress<100).slice(0,4);$("#dashboardGoals").className=items.length?"goal-list":"goal-list empty-state";$("#dashboardGoals").innerHTML=items.length?items.map(g=>`<div class="goal-mini"><div class="goal-mini-head"><strong>${esc(g.title)}</strong><span>${Math.round(g.progress)}%</span></div><div class="progress-track"><div class="progress-fill" style="width:${g.progress}%"></div></div></div>`).join(""):"Ajoute un objectif pour suivre tes progrès.";}
 function renderWeekBars(){const start=startOfWeek();$("#weekRange").textContent=`${dateFR(dateKey(start))} – ${dateFR(dateKey(new Date(start.getTime()+6*86400000)))}`;let html="";for(let i=0;i<7;i++){const d=new Date(start);d.setDate(d.getDate()+i);const key=dateKey(d);const total=state.tasks.filter(t=>t.date===key).length;const done=state.tasks.filter(t=>t.date===key&&t.done).length;const pct=total?done/total*100:0;html+=`<div class="day-bar"><div class="bar-track"><div class="bar-fill" style="height:${pct||3}%"></div></div><small>${["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"][i]}</small></div>`;}$("#weekBars").innerHTML=html;}
