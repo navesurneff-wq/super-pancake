@@ -151,4 +151,4 @@ $("#unlockButton").addEventListener("click",async()=>{const pin=$("#pinInput").v
 window.addEventListener("online",()=>$("#connectionState").innerHTML="<i></i> Connecté");window.addEventListener("offline",()=>$("#connectionState").innerHTML="<i></i> Hors ligne prêt");
 window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstall=e;});
 if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
-(async()=>{await load();normalizeGoalTree();render();await checkPin();})();
+(async()=>{await load();normalizeGoalTree();render();await checkPin();})()
