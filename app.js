@@ -3,9 +3,8 @@ const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const today = () => new Date().toISOString().slice(0,10);
 const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now()+"-"+Math.random().toString(16).slice(2));
-const money = n => new Intl.NumberFormat("fr-FR",{style:"currency",currency:"EUR",maximumFractionDigits:2}).format(Number(n||0));
 const dateFR = d => new Date(d+"T12:00:00").toLocaleDateString("fr-FR",{day:"2-digit",month:"short",year:"numeric"});
-const state = {tasks:[],goals:[],transactions:[],sports:[],habits:[],projects:[],routines:[],reviews:[],settings:{pinHash:null}};
+const state = {tasks:[],goals:[],sports:[],habits:[],projects:[],routines:[],reviews:[],settings:{pinHash:null}};
 let goalMode="active", editing=null, editingRoutineId=null, editingTaskId=null, db=null, deferredInstall=null;
 async function openDB(){
   return new Promise((resolve,reject)=>{
@@ -24,8 +23,6 @@ async function save(){
 }
 function toast(message){const el=$("#toast");el.textContent=message;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),2400);}
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-function monthItems(){return state.transactions.filter(x=>x.date.slice(0,7)===today().slice(0,7));}
-function monthTotals(){const a=monthItems();return {income:a.filter(x=>x.kind==="Revenu").reduce((s,x)=>s+Number(x.amount),0),expense:a.filter(x=>x.kind==="Dépense").reduce((s,x)=>s+Number(x.amount),0)};}
 function startOfWeek(d=new Date()){const x=new Date(d);const day=(x.getDay()+6)%7;x.setDate(x.getDate()-day);x.setHours(0,0,0,0);return x;}
 function dateKey(d){return d.toISOString().slice(0,10);}
 function render(){
@@ -36,13 +33,21 @@ function render(){
   $("#statGoals").textContent=goals.length;$("#statBranches").textContent=branches;$("#statHabits").textContent=state.routines.length;
   renderDashboardTasks();renderDashboardGoals();renderGoals();renderTodo();renderSport();renderWork();renderAssistant();
 }
-function taskHTML(t){return `<div class="task-row"><button class="task-check ${t.done?"done":""}" data-complete="${esc(t.id)}" aria-label="Terminer">${t.done?"✓":""}</button><div class="task-main"><div class="task-title ${t.done?"completed":""}">${esc(t.title)}</div><div class="task-meta">${esc(t.notes||"Aucune note")}</div></div><span class="priority ${t.priority==="Haute"?"high":t.priority==="Moyenne"?"medium":""}">${esc(t.priority||"Moyenne")}</span></div>`;}
+function taskHTML(t){return `<div class="task-row"><button class="task-check ${t.done?"done":""}" data-complete="${esc(t.id)}" aria-label="Terminer">${t.done?"✓":""}</button><div class="task-main"><div class="task-title ${t.done?"completed":""}">${esc(t.title)}</div></div></div>`;}
 function taskRank(p){return ({Haute:0,Moyenne:1,Basse:2})[p]??1;}
 function renderDashboardTasks(){const items=[...state.tasks].sort((a,b)=>(a.order??0)-(b.order??0)).slice(0,5);$("#dashboardTasks").className=items.length?"task-list":"task-list empty-state";$("#dashboardTasks").innerHTML=items.length?items.map(taskHTML).join(""):"Aucune tâche pour le moment.";}
-function renderTodo(){const items=[...state.tasks].sort((a,b)=>(a.order??0)-(b.order??0));const body=$("#todoTableBody");if(!body)return;$("#todoCount").textContent=`${items.length} tâche(s) · ${items.filter(x=>!x.done).length} restante(s)`;$("#todoEmpty").hidden=items.length>0;body.innerHTML=items.map((t,i)=>`<tr class="${t.done?"todo-done":""}"><td><input type="checkbox" data-complete="${esc(t.id)}" ${t.done?"checked":""} aria-label="Marquer comme terminé"></td><td><strong>${esc(t.title)}</strong>${t.notes?`<p>${esc(t.notes).replace(/\n/g,"<br>")}</p>`:""}</td><td><span class="priority ${t.priority==="Haute"?"high":t.priority==="Moyenne"?"medium":""}">${esc(t.priority||"Moyenne")}</span></td><td class="todo-actions"><button class="icon-button" data-task-up="${esc(t.id)}" ${i===0?"disabled":""} aria-label="Monter">↑</button><button class="icon-button" data-task-down="${esc(t.id)}" ${i===items.length-1?"disabled":""} aria-label="Descendre">↓</button><button class="icon-button" data-task-edit="${esc(t.id)}" aria-label="Modifier">✎</button><button class="icon-button" data-task-delete="${esc(t.id)}" aria-label="Supprimer">×</button></td></tr>`).join("");}
+function renderDashboardGoals(){
+  const items=state.goals.filter(g=>g.progress<100).slice(0,3);
+  const el=$("#dashboardGoals");
+  if(!el)return;
+  el.className=items.length?"goal-list":"goal-list empty-state";
+  el.innerHTML=items.length?items.map(g=>`<button type="button" class="goal-mini goal-mini-button" data-goal-open="${esc(g.id)}"><span class="goal-mini-head"><strong>${esc(g.title)}</strong><span>${Math.round(g.progress||0)}%</span></span><span class="progress-track"><span class="progress-fill" style="display:block;width:${Math.max(0,Math.min(100,Number(g.progress)||0))}%"></span></span><small>Appuie pour ouvrir les étapes</small></button>`).join(""):"Aucun objectif en cours.";
+}
+function renderTodo(){const items=[...state.tasks].sort((a,b)=>(a.order??0)-(b.order??0));const body=$("#todoTableBody");if(!body)return;$("#todoCount").textContent=`${items.length} tâche(s) · ${items.filter(x=>!x.done).length} restante(s)`;$("#todoEmpty").hidden=items.length>0;body.innerHTML=items.map(t=>`<tr class="${t.done?"todo-done":""}"><td><input type="checkbox" data-complete="${esc(t.id)}" ${t.done?"checked":""} aria-label="Marquer comme terminé"></td><td><strong>${esc(t.title)}</strong></td><td class="todo-actions"><button class="icon-button" data-task-edit="${esc(t.id)}" aria-label="Modifier la tâche" title="Modifier">✎</button><button class="delete-task-button" data-task-delete="${esc(t.id)}" aria-label="Supprimer la tâche" title="Supprimer">Supprimer</button></td></tr>`).join("");}
 function normalizeGoalTree(){
   for(const g of state.goals){
     if(!Array.isArray(g.steps))g.steps=[];
+    if(typeof g.branchesOpen!=="boolean")g.branchesOpen=false;
     const normalizeList=(nodes)=>nodes.map(item=>{
       const node=typeof item==="string"?{title:item}:item||{};
       node.id=node.id||uid();
@@ -74,7 +79,7 @@ function renderGoalBranch(g,node,depth=0){
 }
 function renderGoals(){
   let list=state.goals;if(goalMode==="active")list=list.filter(g=>g.progress<100);if(goalMode==="done")list=list.filter(g=>g.progress>=100);
-  $("#goalsList").innerHTML=list.length?list.map(g=>{const progress=updateGoalProgress(g);const opened=!!g.branchesOpen;return `<article class="goal-card"><button type="button" class="goal-open-button" data-goal-open="${esc(g.id)}"><div class="goal-card-head"><div><p class="eyebrow">${esc(g.category||"PERSONNEL")}</p><h3>${esc(g.title)}</h3></div><strong>${Math.round(g.progress)}%</strong><span class="goal-chevron">${opened?"▾":"›"}</span></div><p>${esc(g.details||"Appuie pour afficher les branches et les étapes de cet objectif.")}</p><div class="progress-track"><div class="progress-fill" style="width:${g.progress}%"></div></div><div class="goal-footer"><span>Échéance : ${g.date?dateFR(g.date):"Non définie"}</span><span>${g.progress>=100?"Terminé":"En cours"}</span></div></button>
+  $("#goalsList").innerHTML=list.length?list.map(g=>{const progress=updateGoalProgress(g);const opened=!!g.branchesOpen;return `<article class="goal-card"><button type="button" class="goal-open-button" data-goal-open="${esc(g.id)}"><div class="goal-card-head"><div><p class="eyebrow">${esc(g.category||"PERSONNEL")}</p><h3>${esc(g.title)}</h3></div><strong>${Math.round(g.progress)}%</strong><span class="goal-chevron">${opened?"▾":"›"}</span></div>${g.details?`<p>${esc(g.details)}</p>`:""}<div class="progress-track"><div class="progress-fill" style="width:${g.progress}%"></div></div><div class="goal-footer"><span>Échéance : ${g.date?dateFR(g.date):"Non définie"}</span><span>${g.progress>=100?"Terminé":"En cours"}</span></div></button>
   ${opened?`<div class="goal-branches"><div class="goal-branches-heading"><strong>Branches et sous-objectifs</strong><small>${progress.done}/${progress.total} étapes terminées</small></div>${g.steps.length?g.steps.map(node=>renderGoalBranch(g,node)).join(""):'<p class="task-meta">Aucune branche pour le moment.</p>'}<button type="button" data-goal-add-root="${esc(g.id)}" class="secondary-button">＋ Ajouter une branche</button><div class="goal-actions"><button data-delete-goal="${esc(g.id)}">Supprimer l’objectif</button></div></div>`:""}</article>`;}).join(""):'<div class="panel empty-state">Aucun objectif dans cette catégorie.</div>';
 }
 function findGoalNode(nodes,id){for(const node of nodes||[]){if(node.id===id)return node;const found=findGoalNode(node.children,id);if(found)return found;}return null;}
@@ -88,7 +93,7 @@ function insights(){const arr=[],open=state.tasks.filter(t=>!t.done),goals=state
 function renderAssistant(){$("#insightsList").innerHTML=insights().map(i=>`<div class="insight-card"><div class="insight-icon">${i[0]}</div><div><strong>${esc(i[1])}</strong><p>${esc(i[2])}</p></div></div>`).join("");}
 function generateReview(){const tasks=state.tasks,done=tasks.filter(t=>t.done).length,activeGoals=state.goals.filter(g=>g.progress<100);const text=`BILAN PERSONNEL\n\nOrganisation : ${done} tâche(s) terminée(s) sur ${tasks.length} (${tasks.length?Math.round(done/tasks.length*100):0} %).\nObjectifs actifs : ${activeGoals.length}.\nRoutines créées : ${state.routines.length}.\n\nPistes pour la suite :\n• Choisir les tâches de priorité haute.\n• Décomposer un objectif en branches concrètes.\n• Faire le point sur les routines quotidiennes.`;$("#reviewOutput").textContent=text;state.reviews.unshift({id:uid(),date:today(),mode:"personal",text});save();}
 const field=(label,name,type="text",value="",extra="")=>`<div class="field"><label for="f-${name}">${label}</label><input id="f-${name}" name="${name}" type="${type}" value="${esc(value)}" ${extra}></div>`;
-function openForm(type){editing=type;let title="",fields="";if(type==="task"||type==="task-edit"){const t=type==="task-edit"?state.tasks.find(x=>String(x.id)===String(editingTaskId)):null;title=t?"Modifier la tâche":"Ajouter une tâche";fields=field("Tâche ou titre de la note","title","text",t?.title||"")+`<div class="field"><label>Note / détails (facultatif)</label><textarea name="notes" rows="4" placeholder="Ajoute tes idées, détails ou informations…">${esc(t?.notes||"")}</textarea></div><div class="field"><label>Importance</label><select name="priority"><option ${t?.priority==="Haute"?"selected":""}>Haute</option><option ${!t||t.priority==="Moyenne"?"selected":""}>Moyenne</option><option ${t?.priority==="Basse"?"selected":""}>Basse</option></select></div>`;}
+function openForm(type){editing=type;let title="",fields="";if(type==="task"||type==="task-edit"){const t=type==="task-edit"?state.tasks.find(x=>String(x.id)===String(editingTaskId)):null;title=t?"Modifier la tâche":"Ajouter une tâche";fields=field("Nom de la tâche","title","text",t?.title||"");}
 
 if(type==="goal"){title="Nouvel objectif";fields=field("Nom de l'objectif","title")+`<div class="field"><label>Description</label><textarea name="details"></textarea></div>`+field("Échéance","date","date",new Date(Date.now()+90*86400000).toISOString().slice(0,10))+`<div class="field"><label>Catégorie</label><select name="category">${["Personnel","Travail","Sport","Santé","Apprentissage"].map(x=>`<option>${x}</option>`).join("")}</select></div>`;}
 if(type==="sport"){title="Nouvelle séance";fields=`<div class="field"><label>Activité</label><select name="type">${["Tennis","Course à pied","Renforcement","Marche","Vélo","Autre"].map(x=>`<option>${x}</option>`).join("")}</select></div>`+field("Durée (minutes)","minutes","number","60",{min:"1"})+field("Distance (km, facultatif)","distance","number","",{min:"0",step:"0.1"})+field("Date","date","date",today());}
@@ -100,7 +105,7 @@ Lire 10 pages">${esc((r?.steps||[]).map(s=>s.title).join("\n"))}</textarea><smal
 if(type==="project"){title="Nouveau projet";fields=field("Nom du projet","title")+`<div class="field"><label>Description</label><textarea name="details"></textarea></div>`;}
 $("#dialogTitle").textContent=title;$("#dialogFields").innerHTML=fields;$("#editDialog").showModal();}
 function formData(){return Object.fromEntries(new FormData($("#editForm")).entries());}
-$("#saveDialog").addEventListener("click",e=>{e.preventDefault();const f=formData();if(!f.title?.trim()&&editing!=="sport"){toast("Ajoute un titre.");return;}if(editing==="task"||editing==="task-edit"){if(editing==="task-edit"){const t=state.tasks.find(x=>String(x.id)===String(editingTaskId));if(t){t.title=f.title.trim();t.notes=f.notes||"";t.priority=f.priority;}}else state.tasks.push({id:uid(),title:f.title.trim(),notes:f.notes||"",priority:f.priority||"Moyenne",done:false,order:state.tasks.length});editingTaskId=null;}
+$("#saveDialog").addEventListener("click",e=>{e.preventDefault();const f=formData();if(!f.title?.trim()&&editing!=="sport"){toast("Ajoute un titre.");return;}if(editing==="task"||editing==="task-edit"){if(editing==="task-edit"){const t=state.tasks.find(x=>String(x.id)===String(editingTaskId));if(t){t.title=f.title.trim();}}else state.tasks.push({id:uid(),title:f.title.trim(),done:false,order:state.tasks.length});editingTaskId=null;}
 if(editing==="goal")state.goals.push({id:uid(),title:f.title.trim(),details:f.details,date:f.date,category:f.category,progress:0,steps:[]});
 if(editing==="sport")state.sports.push({id:uid(),type:f.type,minutes:Number(f.minutes),distance:Number(f.distance||0),date:f.date});
 if(editing==="habit")state.habits.push({id:uid(),title:f.title.trim(),frequency:f.frequency,active:true});
@@ -115,7 +120,7 @@ const go=e.target.closest("[data-go]");if(go)navigate(go.dataset.go);
 const nav=e.target.closest("[data-page]");if(nav)navigate(nav.dataset.page);
 const complete=e.target.closest("[data-complete]");if(complete)completeTask(complete.dataset.complete);
 const taskEdit=e.target.closest("[data-task-edit]");if(taskEdit){editingTaskId=taskEdit.dataset.taskEdit;openForm("task-edit");}
-const taskDelete=e.target.closest("[data-task-delete]");if(taskDelete){state.tasks=state.tasks.filter(t=>String(t.id)!==taskDelete.dataset.taskDelete);save();render();}
+const taskDelete=e.target.closest("[data-task-delete]");if(taskDelete&&confirm("Supprimer cette tâche ?")){state.tasks=state.tasks.filter(t=>String(t.id)!==taskDelete.dataset.taskDelete);save();render();}
 const taskUp=e.target.closest("[data-task-up]");if(taskUp)moveTask(taskUp.dataset.taskUp,-1);
 const taskDown=e.target.closest("[data-task-down]");if(taskDown)moveTask(taskDown.dataset.taskDown,1);
 const goalOpen=e.target.closest("[data-goal-open]");if(goalOpen){const g=state.goals.find(x=>String(x.id)===goalOpen.dataset.goalOpen);if(g){g.branchesOpen=!g.branchesOpen;save();renderGoals();}}
@@ -142,8 +147,8 @@ $("#generateReview").addEventListener("click",generateReview);
 $("#openSettings").addEventListener("click",()=>$("#settingsDialog").showModal());
 $("#exportButton").addEventListener("click",()=>{const blob=new Blob([JSON.stringify({app:"LIFE TRACKER",version:2,exportedAt:new Date().toISOString(),data:state},null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="life-tracker-backup-"+today()+".json";a.click();URL.revokeObjectURL(a.href);toast("Sauvegarde exportée.");});
 $("#importButton").addEventListener("click",()=>$("#importFile").click());
-$("#importFile").addEventListener("change",async e=>{const file=e.target.files[0];if(!file)return;try{const raw=JSON.parse(await file.text());const d=raw.data||raw;if(!d.tasks||!d.goals)throw new Error("Fichier non reconnu");for(const k of ["tasks","goals","transactions","sports","habits","projects","routines","reviews"])if(Array.isArray(d[k]))state[k]=d[k];if(d.settings)state.settings=d.settings;await save();render();toast("Sauvegarde restaurée.");}catch(err){toast("Fichier de sauvegarde invalide.");}e.target.value="";});
-$("#resetButton").addEventListener("click",async()=>{if(confirm("Effacer définitivement toutes les données de cet appareil ?")){for(const k of ["tasks","goals","transactions","sports","habits","projects","routines","reviews"])state[k]=[];state.settings={pinHash:null};await save();render();$("#settingsDialog").close();toast("Données effacées.");}});
+$("#importFile").addEventListener("change",async e=>{const file=e.target.files[0];if(!file)return;try{const raw=JSON.parse(await file.text());const d=raw.data||raw;if(!d.tasks||!d.goals)throw new Error("Fichier non reconnu");for(const k of ["tasks","goals","sports","habits","projects","routines","reviews"])if(Array.isArray(d[k]))state[k]=d[k];if(d.settings)state.settings=d.settings;await save();render();toast("Sauvegarde restaurée.");}catch(err){toast("Fichier de sauvegarde invalide.");}e.target.value="";});
+$("#resetButton").addEventListener("click",async()=>{if(confirm("Effacer définitivement toutes les données de cet appareil ?")){for(const k of ["tasks","goals","sports","habits","projects","routines","reviews"])state[k]=[];state.settings={pinHash:null};await save();render();$("#settingsDialog").close();toast("Données effacées.");}});
 $("#notifyButton").addEventListener("click",async()=>{if(!("Notification"in window)){toast("Notifications non prises en charge ici.");return;}const p=await Notification.requestPermission();toast(p==="granted"?"Notifications autorisées.":"Autorisation non accordée.");});
 async function hashPin(pin){const data=new TextEncoder().encode(pin);const digest=await crypto.subtle.digest("SHA-256",data);return [...new Uint8Array(digest)].map(x=>x.toString(16).padStart(2,"0")).join("");}
 $("#setPinButton").addEventListener("click",async()=>{const pin=prompt("Choisis un code de 4 à 8 chiffres :");if(!pin)return;if(!/^\d{4,8}$/.test(pin)){toast("Le code doit contenir 4 à 8 chiffres.");return;}state.settings.pinHash=await hashPin(pin);await save();toast("Code configuré.");});

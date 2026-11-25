@@ -8,7 +8,7 @@
   <title>LIFE TRACKER</title>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="apple-touch-icon" href="./icon-192.png">
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./style.css?v=6">
 </head>
 <body>
   <div class="app-shell">
@@ -36,10 +36,10 @@
       </section>
 
       <section class="page" id="page-planning">
-        <div class="page-heading"><div><p class="eyebrow">ORGANISATION PERSONNELLE</p><h1>To Do</h1><p class="muted">Un tableau libre pour tes tâches et tes notes. Aucune date.</p></div><button class="primary-button" data-action="add-task">＋ Ajouter</button></div>
+        <div class="page-heading"><div><p class="eyebrow">ORGANISATION PERSONNELLE</p><h1>To Do</h1><p class="muted">Une liste simple pour noter et suivre tes tâches.</p></div><button class="primary-button" data-action="add-task">＋ Ajouter</button></div>
         <section class="panel todo-board">
-          <div class="panel-heading"><div><p class="eyebrow">MES PRIORITÉS</p><h2>À faire</h2><p class="muted small">Classe tes tâches par importance, modifie-les ou supprime-les à tout moment.</p></div><span class="muted small" id="todoCount">0 tâche</span></div>
-          <div class="todo-table-wrap"><table class="todo-table"><thead><tr><th>Terminé</th><th>Tâche / note</th><th>Importance</th><th>Actions</th></tr></thead><tbody id="todoTableBody"></tbody></table></div>
+          <div class="panel-heading"><div><p class="eyebrow">MA LISTE</p><h2>Mes tâches</h2><p class="muted small">Coche une tâche terminée, modifie-la ou supprime-la.</p></div><span class="muted small" id="todoCount">0 tâche</span></div>
+          <div class="todo-table-wrap"><table class="todo-table"><thead><tr><th>Fait</th><th>Tâche</th><th>Actions</th></tr></thead><tbody id="todoTableBody"></tbody></table></div>
           <div id="todoEmpty" class="empty-state">Ton tableau est vide. Ajoute une tâche ou une note.</div>
         </section>
       </section>
@@ -100,6 +100,6 @@
   <div id="toast" role="status" aria-live="polite"></div>
   <div id="pinOverlay" class="pin-overlay hidden"><div class="pin-card"><div class="brand-mark">L</div><h2>Déverrouiller LIFE TRACKER</h2><p class="muted">Saisis ton code personnel.</p><input id="pinInput" type="password" inputmode="numeric" maxlength="8" placeholder="Code"><button class="primary-button" id="unlockButton">Déverrouiller</button><p id="pinError" class="error-text"></p></div></div>
 
-  <script src="./app.js"></script>
+  <script src="./app.js?v=7"></script>
 </body>
 </html>

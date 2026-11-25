@@ -1,0 +1,14 @@
+LIFE TRACKER — VERSION SANS MODULE ÉCONOMIQUE
+
+Cette version ne contient aucun onglet Argent, Finance, Budget ou suivi économique.
+La navigation comprend uniquement : Accueil, To Do, Objectifs, Routines et Assistant.
+
+Installation / mise à jour :
+1. Décompresser cette archive.
+2. Ouvrir le dossier super-pancake-main.
+3. Remplacer dans le dépôt GitHub tous les anciens fichiers par le contenu de ce dossier.
+4. Vérifier que index.html, app.js, style.css et sw.js sont bien à la racine du dépôt (pas dans un dossier imbriqué).
+5. Valider/committer les modifications et attendre la fin du déploiement GitHub Pages.
+6. Sur iPhone, fermer LIFE TRACKER, ouvrir le site dans Safari et actualiser la page. Si l'ancienne version persiste, supprimer l'icône de l'écran d'accueil puis la réinstaller depuis Safari après vérification de la nouvelle version.
+
+Les données personnelles de tâches, objectifs, sport et routines utilisent la même clé locale life-tracker-v2. Les anciennes données liées à l'ancien module ne sont plus utilisées par cette version.
