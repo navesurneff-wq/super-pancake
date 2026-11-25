@@ -41,7 +41,7 @@ function renderDashboardGoals(){
   const el=$("#dashboardGoals");
   if(!el)return;
   el.className=items.length?"goal-list":"goal-list empty-state";
-  el.innerHTML=items.length?items.map(g=>`<button type="button" class="goal-mini goal-mini-button" data-goal-open="${esc(g.id)}"><span class="goal-mini-head"><strong>${esc(g.title)}</strong><span>${Math.round(g.progress||0)}%</span></span><span class="progress-track"><span class="progress-fill" style="display:block;width:${Math.max(0,Math.min(100,Number(g.progress)||0))}%"></span></span><small>Appuie pour ouvrir les étapes</small></button>`).join(""):"Aucun objectif en cours.";
+  el.innerHTML=items.length?items.map(g=>`<button type="button" class="goal-mini goal-mini-button" data-dashboard-goal-open="${esc(g.id)}"><span class="goal-mini-head"><strong>${esc(g.title)}</strong><span>${Math.round(g.progress||0)}%</span></span><span class="progress-track"><span class="progress-fill" style="display:block;width:${Math.max(0,Math.min(100,Number(g.progress)||0))}%"></span></span><small>Appuie pour ouvrir les étapes</small></button>`).join(""):"Aucun objectif en cours.";
 }
 function renderTodo(){const items=[...state.tasks].sort((a,b)=>(a.order??0)-(b.order??0));const body=$("#todoTableBody");if(!body)return;$("#todoCount").textContent=`${items.length} tâche(s) · ${items.filter(x=>!x.done).length} restante(s)`;$("#todoEmpty").hidden=items.length>0;body.innerHTML=items.map(t=>`<tr class="${t.done?"todo-done":""}"><td><input type="checkbox" data-complete="${esc(t.id)}" ${t.done?"checked":""} aria-label="Marquer comme terminé"></td><td><strong>${esc(t.title)}</strong></td><td class="todo-actions"><button class="icon-button" data-task-edit="${esc(t.id)}" aria-label="Modifier la tâche" title="Modifier">✎</button><button class="delete-task-button" data-task-delete="${esc(t.id)}" aria-label="Supprimer la tâche" title="Supprimer">Supprimer</button></td></tr>`).join("");}
 function normalizeGoalTree(){
@@ -123,6 +123,8 @@ const taskEdit=e.target.closest("[data-task-edit]");if(taskEdit){editingTaskId=t
 const taskDelete=e.target.closest("[data-task-delete]");if(taskDelete&&confirm("Supprimer cette tâche ?")){state.tasks=state.tasks.filter(t=>String(t.id)!==taskDelete.dataset.taskDelete);save();render();}
 const taskUp=e.target.closest("[data-task-up]");if(taskUp)moveTask(taskUp.dataset.taskUp,-1);
 const taskDown=e.target.closest("[data-task-down]");if(taskDown)moveTask(taskDown.dataset.taskDown,1);
+const dashboardGoal=e.target.closest("[data-dashboard-goal-open]");
+if(dashboardGoal){const g=state.goals.find(x=>String(x.id)===dashboardGoal.dataset.dashboardGoalOpen);if(g){g.branchesOpen=true;save();renderGoals();navigate("goals");}}
 const goalOpen=e.target.closest("[data-goal-open]");if(goalOpen){const g=state.goals.find(x=>String(x.id)===goalOpen.dataset.goalOpen);if(g){g.branchesOpen=!g.branchesOpen;save();renderGoals();}}
 const routineEdit=e.target.closest("[data-routine-edit]");if(routineEdit){editingRoutineId=routineEdit.dataset.routineEdit;openForm("routine-edit");}
 const routineDelete=e.target.closest("[data-routine-delete]");if(routineDelete&&confirm("Supprimer cette routine et son historique ?")){state.routines=state.routines.filter(r=>r.id!==routineDelete.dataset.routineDelete);save();render();}
