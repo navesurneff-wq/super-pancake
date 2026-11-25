@@ -9,7 +9,6 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="apple-touch-icon" href="./icon-192.png">
   <link rel="stylesheet" href="./style.css">
-    <link rel="stylesheet" href="./daily-todo.css">
 </head>
 <body>
   <div class="app-shell">
@@ -24,37 +23,25 @@
         <div class="stats-grid">
           <article class="stat-card"><span class="stat-icon green">✓</span><span class="stat-label">Tâches ouvertes</span><strong id="statOpen">0</strong><small id="statDue">Aucune échéance aujourd'hui</small></article>
           <article class="stat-card"><span class="stat-icon blue">◎</span><span class="stat-label">Objectifs actifs</span><strong id="statGoals">0</strong><small>En cours de progression</small></article>
-          <article class="stat-card"><span class="stat-icon amber">€</span><span class="stat-label">Solde du mois</span><strong id="statBalance">0 €</strong><small>Revenus moins dépenses</small></article>
+          <article class="stat-card"><span class="stat-icon amber">⌘</span><span class="stat-label">Branches actives</span><strong id="statBranches">0</strong><small>Étapes de tes objectifs</small></article>
           <article class="stat-card"><span class="stat-icon violet">↗</span><span class="stat-label">Habitudes suivies</span><strong id="statHabits">0</strong><small>Routines actives</small></article>
         </div>
 
-        <section class="panel daily-todo-panel">
-          <div class="panel-heading">
-            <div>
-              <p class="eyebrow">ORGANISATION QUOTIDIENNE</p>
-              <h2>Ma To Do List</h2>
-              <p class="muted small" id="dailyTodoCount">0 tâche terminée</p>
-            </div>
-            <button class="primary-button" data-action="add-task">＋ Ajouter</button>
-          </div>
-          <div class="daily-progress">
-            <div class="progress-track"><div class="progress-fill" id="dailyTodoProgress" style="width:0%"></div></div>
-            <strong id="dailyTodoPercent">0%</strong>
-          </div>
-          <div id="dailyTodoList" class="task-list empty-state">Aucune tâche prévue aujourd'hui.</div>
+        <section class="panel">
+          <div class="panel-heading"><div><p class="eyebrow">ORGANISATION</p><h2>Ma liste de tâches</h2><p class="muted small">Tes priorités, sans échéance.</p></div><button class="text-button" data-go="planning">Ouvrir la liste →</button></div>
+          <div id="dashboardTasks" class="task-list empty-state">Aucune tâche pour le moment.</div>
         </section>
 
-        <div class="dashboard-grid">
-          <section class="panel"><div class="panel-heading"><div><p class="eyebrow">PRIORITÉS</p><h2>À faire ensuite</h2></div><button class="text-button" data-go="planning">Tout voir →</button></div><div id="dashboardTasks" class="task-list empty-state">Aucune tâche pour le moment.</div></section>
-          <section class="panel"><div class="panel-heading"><div><p class="eyebrow">PROGRESSION</p><h2>Objectifs en cours</h2></div><button class="text-button" data-go="goals">Tout voir →</button></div><div id="dashboardGoals" class="goal-list empty-state">Ajoute un objectif pour suivre tes progrès.</div></section>
-        </div>
-        <section class="panel"><div class="panel-heading"><div><p class="eyebrow">VUE D'ENSEMBLE</p><h2>Cette semaine</h2></div><span class="muted small" id="weekRange"></span></div><div class="week-bars" id="weekBars"></div></section>
+        <section class="panel"><div class="panel-heading"><div><p class="eyebrow">PROGRESSION</p><h2>Objectifs en cours</h2></div><button class="text-button" data-go="goals">Tout voir →</button></div><div id="dashboardGoals" class="goal-list empty-state">Ajoute un objectif pour suivre tes progrès.</div></section>
       </section>
 
       <section class="page" id="page-planning">
-        <div class="page-heading"><div><p class="eyebrow">ORGANISATION</p><h1>Planning</h1><p class="muted">Planifie, priorise et avance.</p></div><button class="primary-button" data-action="add-task">＋ Ajouter</button></div>
-        <div class="toolbar"><div class="segmented" id="planningView"><button class="selected" data-view="week">Semaine</button><button data-view="month">Mois</button><button data-view="all">Tout</button></div><select id="taskFilter" aria-label="Filtrer les tâches"><option value="all">Toutes les catégories</option><option>Travail</option><option>Sport</option><option>Finances</option><option>Personnel</option><option>Santé</option><option>Apprentissage</option></select></div>
-        <div id="planningList" class="panel task-list"></div>
+        <div class="page-heading"><div><p class="eyebrow">ORGANISATION PERSONNELLE</p><h1>To Do</h1><p class="muted">Un tableau libre pour tes tâches et tes notes. Aucune date.</p></div><button class="primary-button" data-action="add-task">＋ Ajouter</button></div>
+        <section class="panel todo-board">
+          <div class="panel-heading"><div><p class="eyebrow">MES PRIORITÉS</p><h2>À faire</h2><p class="muted small">Classe tes tâches par importance, modifie-les ou supprime-les à tout moment.</p></div><span class="muted small" id="todoCount">0 tâche</span></div>
+          <div class="todo-table-wrap"><table class="todo-table"><thead><tr><th>Terminé</th><th>Tâche / note</th><th>Importance</th><th>Actions</th></tr></thead><tbody id="todoTableBody"></tbody></table></div>
+          <div id="todoEmpty" class="empty-state">Ton tableau est vide. Ajoute une tâche ou une note.</div>
+        </section>
       </section>
 
       <section class="page" id="page-goals">
@@ -63,11 +50,7 @@
         <div id="goalsList" class="cards-grid"></div>
       </section>
 
-      <section class="page" id="page-finance">
-        <div class="page-heading"><div><p class="eyebrow">ARGENT</p><h1>Finances</h1><p class="muted">Un suivi simple, saisi manuellement.</p></div><button class="primary-button" data-action="add-transaction">＋ Opération</button></div>
-        <div class="stats-grid finance-stats"><article class="stat-card"><span class="stat-label">Revenus du mois</span><strong id="financeIncome">0 €</strong></article><article class="stat-card"><span class="stat-label">Dépenses du mois</span><strong id="financeExpenses">0 €</strong></article><article class="stat-card"><span class="stat-label">Solde du mois</span><strong id="financeNet">0 €</strong></article></div>
-        <section class="panel"><div class="panel-heading"><div><p class="eyebrow">HISTORIQUE</p><h2>Dernières opérations</h2></div><select id="financePeriod"><option value="month">Ce mois</option><option value="all">Tout l'historique</option></select></div><div id="transactionsList" class="transaction-list empty-state">Aucune opération enregistrée.</div></section>
-      </section>
+
 
       <section class="page" id="page-sport">
         <div class="page-heading"><div><p class="eyebrow">ACTIVITÉ</p><h1>Sport</h1><p class="muted">Garde une trace de tes séances.</p></div><button class="primary-button" data-action="add-sport">＋ Séance</button></div>
@@ -76,8 +59,8 @@
       </section>
 
       <section class="page" id="page-work">
-        <div class="page-heading"><div><p class="eyebrow">ORGANISATION PERSONNELLE</p><h1>Routines & projets</h1><p class="muted">Structure tes journées avec des routines réutilisables.</p></div><button class="primary-button" data-action="add-routine">＋ Nouvelle routine</button></div>
-        <section class="panel"><div class="panel-heading"><div><p class="eyebrow">RÉPÉTITION</p><h2>Mes routines</h2><p class="muted small">Coche les étapes au fil de la journée ou de la semaine.</p></div></div><div id="routinesList" class="routines-list empty-state">Aucune routine créée.</div></section>
+        <div class="page-heading"><div><p class="eyebrow">ORGANISATION PERSONNELLE</p><h1>Routines</h1><p class="muted">Tes listes du matin, du soir et de tes journées.</p></div><button class="primary-button" data-action="add-routine">＋ Nouvelle routine</button></div>
+        <section class="panel"><div class="panel-heading"><div><p class="eyebrow">RÉPÉTITION</p><h2>Mes routines</h2><p class="muted small">Crée une routine par moment de la journée. Les cases quotidiennes repartent à zéro chaque jour et l’historique est conservé.</p></div></div><div id="routinesList" class="routines-list empty-state">Aucune routine créée.</div></section>
         <div class="dashboard-grid">
           <section class="panel"><div class="panel-heading"><div><p class="eyebrow">ROUTINES</p><h2>Habitudes</h2></div></div><div id="habitsList" class="habit-list empty-state">Aucune habitude créée.</div></section>
           <section class="panel"><div class="panel-heading"><div><p class="eyebrow">SUIVI</p><h2>Projets</h2></div><button class="text-button" data-action="add-project">＋ Projet</button></div><div id="projectsList" class="project-list empty-state">Aucun projet pour le moment.</div></section>
@@ -94,9 +77,8 @@
 
     <nav class="bottom-nav" aria-label="Navigation principale">
       <button class="nav-item active" data-page="dashboard"><span>⌂</span><small>Accueil</small></button>
-      <button class="nav-item" data-page="planning"><span>▦</span><small>Planning</small></button>
+      <button class="nav-item" data-page="planning"><span>▦</span><small>To Do</small></button>
       <button class="nav-item" data-page="goals"><span>◎</span><small>Objectifs</small></button>
-      <button class="nav-item" data-page="finance"><span>€</span><small>Finances</small></button>
       <button class="nav-item" data-page="work"><span>↻</span><small>Routines</small></button>
       <button class="nav-item" data-page="assistant"><span>✳</span><small>Assistant</small></button>
     </nav>
